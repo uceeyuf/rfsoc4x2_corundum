@@ -1,0 +1,160 @@
+Retest 2026-09-28
+RFSoC 4x2 (192.168.100.1, eth0 = QSFP lane 1) <-> 25G host (192.168.100.2, ConnectX-4 MT27700, mlx5_core)
+Board: Ubuntu 22.04, kernel 5.4.0-xilinx-v2020.2, mqnic.ko from /lib/modules/.../extra
+FPGA (mqnic-dump): Board ID 0x10ee9066, git hash 1ca0151b, build date 2026-06-14 00:18:47 UTC
+Link: 25000Mb/s, FEC off (host ethtool --show-fec: Active FEC encoding: Off)
+iperf3 3.9 on the board, host iperf3 servers on ports 5201-5204
+Host rates are from the mlx5 PHY counters (rx_packets_phy); board RX from /sys/class/net/eth0/statistics.
+
+== 1. ping, MTU 1500, host -> board
+--- 192.168.100.1 ping statistics ---
+10 packets transmitted, 10 received, 0% packet loss, time 9195ms
+rtt min/avg/max/mdev = 0.072/0.122/0.456/0.112 ms
+
+== 2. MTU 1500, all mqnic interrupts on CPU0 (driver default)
+
+-- iperf3 -c 192.168.100.2 -t 10  (board -> host)
+Connecting to host 192.168.100.2, port 5201
+[  5] local 192.168.100.1 port 45632 connected to 192.168.100.2 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   353 MBytes  2.96 Gbits/sec    0    197 KBytes
+[  5]   1.00-2.00   sec   355 MBytes  2.98 Gbits/sec    0    209 KBytes
+[  5]   2.00-3.00   sec   354 MBytes  2.97 Gbits/sec    0    209 KBytes
+[  5]   3.00-4.00   sec   346 MBytes  2.90 Gbits/sec    0    209 KBytes
+[  5]   4.00-5.00   sec   349 MBytes  2.92 Gbits/sec    0    222 KBytes
+[  5]   5.00-6.00   sec   349 MBytes  2.92 Gbits/sec    0    235 KBytes
+[  5]   6.00-7.00   sec   348 MBytes  2.92 Gbits/sec    0    235 KBytes
+[  5]   7.00-8.00   sec   349 MBytes  2.92 Gbits/sec    0    235 KBytes
+[  5]   8.00-9.00   sec   349 MBytes  2.92 Gbits/sec    0    359 KBytes
+[  5]   9.00-10.00  sec   349 MBytes  2.93 Gbits/sec    0    359 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.00  sec  3.42 GBytes  2.93 Gbits/sec    0             sender
+[  5]   0.00-10.00  sec  3.42 GBytes  2.93 Gbits/sec                  receiver
+iperf Done.
+
+-- iperf3 -c 192.168.100.2 -t 5 -V  (CPU utilisation)
+[  5]   0.00-5.00   sec  1.73 GBytes  2.97 Gbits/sec    0             sender
+[  5]   0.00-5.00   sec  1.73 GBytes  2.97 Gbits/sec                  receiver
+CPU Utilization: local/sender 98.0% (0.2%u/97.8%s), remote/receiver 10.3% (0.5%u/9.8%s)
+
+-- iperf3 -c 192.168.100.2 -t 10 -R  (host -> board)
+[  5]   0.00-10.00  sec  2.91 GBytes  2.49 Gbits/sec  1896             sender
+[  5]   0.00-10.00  sec  2.90 GBytes  2.49 Gbits/sec                  receiver
+
+-- iperf3 -c 192.168.100.2 -u -b 10G -t 10
+[  5]   0.00-10.00  sec  1.11 GBytes   953 Mbits/sec  0.000 ms  0/822403 (0%)  sender
+[  5]   0.00-10.00  sec  1.11 GBytes   953 Mbits/sec  0.012 ms  0/822403 (0%)  receiver
+
+-- /proc/interrupts (mqnic0-0..3 all on CPU0)
+ 44: 431479 0 0 0 GICv2 121 Edge mqnic0-0
+ 45: 166 0 0 0 GICv2 122 Edge mqnic0-1
+ 46: 876658 0 0 0 GICv2 123 Edge mqnic0-2
+ 47: 115991 0 0 0 GICv2 124 Edge mqnic0-3
+-- top during pktgen, 4 threads: kpktgend_1..3 100% (spinning on full rings), kpktgend_0 50%, ksoftirqd/0 50%
+
+-- pktgen board -> host, 1 thread, 1514 B, 2000000 frames
+Result: OK: 1745055(c1744129+d926) usec, 2000000 (1514byte,0frags)
+  1146095pps 13881Mb/sec (13881502640bps) errors: 0
+host rx_packets_phy delta: 2000000
+
+-- pktgen board -> host, 4 threads, 1514 B, 2000000 frames each
+q0: Result: OK: 7436109(c4519093+d2917016) usec, 2000000 (1514byte,0frags) 268957pps 3257Mb/sec errors: 0
+q1: Result: OK: 5675044(c5672681+d2362) usec, 2000011 (1514byte,0frags) 352422pps 4268Mb/sec errors: 0
+q2: Result: OK: 5790151(c5789002+d1148) usec, 2000013 (1514byte,0frags) 345416pps 4183Mb/sec errors: 0
+q3: Result: OK: 5796330(c5794609+d1721) usec, 2000019 (1514byte,0frags) 345049pps 4179Mb/sec errors: 0
+total 8000000 frames / 7.44 s = 1.076 Mpps; host PHY received 8000044 (44 background frames), crc errors 0
+
+-- pktgen board -> host, 1 thread, 60 B
+q0: Result: OK: 3914022(c3911870+d2152) usec, 5000000 (60byte,0frags) 1277458pps 613Mb/sec (613179840bps) errors: 0
+host PHY received 5000000 of 5000000
+
+-- pktgen board -> host, 4 threads, 60 B, 3000000 each: 1.256 Mpps, host received 12000000 of 12000000
+
+-- pktgen board -> host, 1 thread, 512 B
+q0: Result: OK: 2372814(c2370548+d2266) usec, 3000000 (512byte,0frags) 1264321pps 5178Mb/sec (5178658816bps) errors: 0
+host PHY received 3000000 of 3000000
+
+-- pktgen board -> host, 4 threads, 512 B
+q0: Result: OK: 9810419(c6026055+d3784364) usec, 3000000 (512byte,0frags) 305797pps 1252Mb/sec (1252544512bps) errors: 0
+q1: Result: OK: 7567139(c7564678+d2460) usec, 3000000 (512byte,0frags) 396451pps 1623Mb/sec (1623863296bps) errors: 0
+q2: Result: OK: 7570514(c7569469+d1045) usec, 3000000 (512byte,0frags) 396274pps 1623Mb/sec (1623138304bps) errors: 0
+q3: Result: OK: 7605203(c7603451+d1752) usec, 3000000 (512byte,0frags) 394466pps 1615Mb/sec (1615732736bps) errors: 0
+total 12000000 frames / 9.81 s = 1.223 Mpps; host PHY received 12000001
+
+== 3. MTU 1500, mqnic interrupts spread over CPU0-3 (scripts/test/board_setup.sh)
+
+-- pktgen board -> host, 4 threads, 1514 B
+q0: Result: OK: 5946052(c5932056+d13995) usec, 3000016 (1514byte,0frags) 504539pps 6110Mb/sec (6110976368bps) errors: 0
+q1: Result: OK: 5930818(c5914451+d16366) usec, 3000010 (1514byte,0frags) 505834pps 6126Mb/sec (6126661408bps) errors: 0
+q2: Result: OK: 5945527(c5928389+d17137) usec, 3000002 (1514byte,0frags) 504581pps 6111Mb/sec (6111485072bps) errors: 0
+q3: Result: OK: 5878343(c5861639+d16704) usec, 3000000 (1514byte,0frags) 510347pps 6181Mb/sec (6181322864bps) errors: 0
+total 12000000 frames / 5.95 s = 2.018 Mpps = 24.51 Gbit/s L2 incl. FCS, 24.83 Gbit/s on the wire
+host PHY received 12000028 (28 background frames), crc errors 0
+
+-- pktgen board -> host, 1 thread, 1514 B
+q0: Result: OK: 2601163(c2599741+d1422) usec, 3000000 (1514byte,0frags) 1153329pps 13969Mb/sec (13969120848bps) errors: 0
+host PHY received 3000000 of 3000000
+
+-- pktgen board -> host, 4 threads, 60 B
+q0: Result: OK: 4212816(c4209342+d3473) usec, 5000000 (60byte,0frags) 1186854pps 569Mb/sec (569689920bps) errors: 0
+q1: Result: OK: 4217632(c4213792+d3840) usec, 5000000 (60byte,0frags) 1185499pps 569Mb/sec (569039520bps) errors: 0
+q2: Result: OK: 4198966(c4196254+d2712) usec, 5000000 (60byte,0frags) 1190769pps 571Mb/sec (571569120bps) errors: 0
+q3: Result: OK: 4186740(c4182704+d4035) usec, 5000000 (60byte,0frags) 1194246pps 573Mb/sec (573238080bps) errors: 0
+total 20000000 frames / 4.22 s = 4.742 Mpps; host PHY received 20000000 of 20000000
+
+-- iperf3 -t 10  (board -> host)
+[  5]   0.00-10.00  sec  6.04 GBytes  5.19 Gbits/sec    0             sender
+[  5]   0.00-10.00  sec  6.04 GBytes  5.19 Gbits/sec                  receiver
+
+-- iperf3 -t 10 -R  (host -> board)
+[  5]   0.00-10.00  sec  2.72 GBytes  2.34 Gbits/sec  1677             sender
+[  5]   0.00-10.00  sec  2.72 GBytes  2.34 Gbits/sec                  receiver
+
+-- iperf3 -t 10 -P 4  (one process, one core)
+[SUM]   0.00-10.01  sec  4.13 GBytes  3.54 Gbits/sec    0             sender
+[SUM]   0.00-10.01  sec  4.13 GBytes  3.54 Gbits/sec                  receiver
+
+-- iperf3 -t 10 -R -P 4  (one process, one core)
+[SUM]   0.00-10.00  sec  5.03 GBytes  4.32 Gbits/sec  823             sender
+[SUM]   0.00-10.00  sec  5.01 GBytes  4.31 Gbits/sec                  receiver
+
+-- scripts/test/iperf_multi.sh  (4 processes, one per CPU, board -> host)
+total (receiver): 9.79 Gbits/sec
+
+-- scripts/test/iperf_multi.sh -R  (host -> board)
+total (receiver): 5.25 Gbits/sec
+
+-- pktgen host -> board, 4 threads, 1514 B, 3000000 each (board eth0 rx_packets before 13536821)
+q0: Result: OK: 5825623(c5823744+d1878) usec, 3000026 (1514byte,0frags) 514970pps 6237Mb/sec errors: 0
+q1: Result: OK: 5907101(c5906134+d966) usec, 3000018 (1514byte,0frags) 507866pps 6151Mb/sec errors: 0
+q2: Result: OK: 5907356(c5906495+d860) usec, 3000022 (1514byte,0frags) 507845pps 6151Mb/sec errors: 0
+q3: Result: OK: 5892862(c5891402+d1459) usec, 3000004 (1514byte,0frags) 509091pps 6166Mb/sec errors: 0
+board eth0 rx_packets after 15450102: received 1913281 of 12000070 (15.9%)
+board rx_dropped 0, rx_missed_errors 0, rx_errors 0, rx_fifo_errors 0
+NET_RX softirqs per CPU: 3199452 1163978 1065372 869108
+
+== 4. MTU 9000 on both sides, interrupts spread
+
+-- ping -M do -s 8972 192.168.100.1
+3 packets transmitted, 3 received, 0% packet loss, time 2031ms
+rtt min/avg/max/mdev = 0.212/0.223/0.244/0.014 ms
+
+-- iperf3 -t 10  (board -> host)
+[  5]   0.00-10.00  sec  12.7 GBytes  10.9 Gbits/sec                  receiver
+
+-- iperf3 -t 10 -R  (host -> board)
+[  5]   0.00-10.00  sec  6.89 GBytes  5.92 Gbits/sec                  receiver
+
+-- scripts/test/iperf_multi.sh  (board -> host)
+total (receiver): 19.55 Gbits/sec   (repeat run: 19.57 Gbits/sec)
+
+-- scripts/test/iperf_multi.sh -R  (host -> board)
+total (receiver): 11.78 Gbits/sec
+
+-- pktgen host -> board, 4 threads, 9014 B, 600000 each (board eth0 rx_packets before 2961968)
+q0: Result: OK: 6606865(c6595373+d11491) usec, 600022 (9014byte,0frags) 90817pps 6548Mb/sec errors: 0
+q1: Result: OK: 6934952(c6932087+d2865) usec, 600024 (9014byte,0frags) 86521pps 6239Mb/sec errors: 0
+q2: Result: OK: 6908632(c6902893+d5738) usec, 600030 (9014byte,0frags) 86852pps 6263Mb/sec errors: 0
+q3: Result: OK: 6730344(c6721729+d8615) usec, 600008 (9014byte,0frags) 89149pps 6428Mb/sec errors: 0
+board received 1399248 of 2400084 (58.3%), 0.202 Mpps, 14.56 Gbit/s over the 6.93 s send window

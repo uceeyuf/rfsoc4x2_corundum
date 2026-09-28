@@ -1,0 +1,253 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------
+| Tool Version      : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
+| Date              : Mon Sep 28 05:40:30 2026
+| Host              : YYJ running 64-bit major release  (build 9200)
+| Command           : report_timing_summary -file timing_summary.rpt
+| Design            : fpga
+| Device            : xczu48dr-ffvg1517
+| Speed File        : -2  PRODUCTION 1.30 11-12-2020
+| Temperature Grade : E
+-----------------------------------------------------------------------------------------
+
+Timing Summary Report
+
+------------------------------------------------------------------------------------------------
+| Timer Settings
+| --------------
+------------------------------------------------------------------------------------------------
+
+  Enable Multi Corner Analysis               :  Yes
+  Enable Pessimism Removal                   :  Yes
+  Pessimism Removal Resolution               :  Nearest Common Node
+  Enable Input Delay Default Clock           :  No
+  Enable Preset / Clear Arcs                 :  No
+  Disable Flight Delays                      :  No
+  Ignore I/O Paths                           :  No
+  Timing Early Launch at Borrowing Latches   :  No
+  Borrow Time for Max Delay Exceptions       :  Yes
+  Merge Timing Exceptions                    :  Yes
+
+  Corner  Analyze    Analyze    
+  Name    Max Paths  Min Paths  
+  ------  ---------  ---------  
+  Slow    Yes        Yes        
+  Fast    Yes        Yes        
+
+
+
+check_timing report
+
+Table of Contents
+-----------------
+1. checking no_clock (0)
+2. checking constant_clock (0)
+3. checking pulse_width_clock (0)
+4. checking unconstrained_internal_endpoints (0)
+5. checking no_input_delay (0)
+6. checking no_output_delay (0)
+7. checking multiple_clock (0)
+8. checking generated_clocks (0)
+9. checking loops (0)
+10. checking partial_input_delay (0)
+11. checking partial_output_delay (0)
+12. checking latch_loops (0)
+
+1. checking no_clock (0)
+------------------------
+ There are 0 register/latch pins with no clock.
+
+
+2. checking constant_clock (0)
+------------------------------
+ There are 0 register/latch pins with constant_clock.
+
+
+3. checking pulse_width_clock (0)
+---------------------------------
+ There are 0 register/latch pins which need pulse_width check
+
+
+4. checking unconstrained_internal_endpoints (0)
+------------------------------------------------
+ There are 0 pins that are not constrained for maximum delay.
+
+ There are 0 pins that are not constrained for maximum delay due to constant clock.
+
+
+5. checking no_input_delay (0)
+------------------------------
+ There are 0 input ports with no input delay specified.
+
+ There are 0 input ports with no input delay but user has a false path constraint.
+
+
+6. checking no_output_delay (0)
+-------------------------------
+ There are 0 ports with no output delay specified.
+
+ There are 0 ports with no output delay but user has a false path constraint
+
+ There are 0 ports with no output delay but with a timing clock defined on it or propagating through it
+
+
+7. checking multiple_clock (0)
+------------------------------
+ There are 0 register/latch pins with multiple clocks.
+
+
+8. checking generated_clocks (0)
+--------------------------------
+ There are 0 generated clocks that are not connected to a clock source.
+
+
+9. checking loops (0)
+---------------------
+ There are 0 combinational loops in the design.
+
+
+10. checking partial_input_delay (0)
+------------------------------------
+ There are 0 input ports with partial input delay specified.
+
+
+11. checking partial_output_delay (0)
+-------------------------------------
+ There are 0 ports with partial output delay specified.
+
+
+12. checking latch_loops (0)
+----------------------------
+ There are 0 combinational latch loops in the design through latch input
+
+
+
+------------------------------------------------------------------------------------------------
+| Design Timing Summary
+| ---------------------
+------------------------------------------------------------------------------------------------
+
+    WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+    -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+      0.051        0.000                      0               164976        0.010        0.000                      0               164436        0.166        0.000                       0                 55929  
+
+
+All user specified timing constraints are met.
+
+
+------------------------------------------------------------------------------------------------
+| Clock Summary
+| -------------
+------------------------------------------------------------------------------------------------
+
+Clock                                 Waveform(ns)             Period(ns)      Frequency(MHz)
+-----                                 ------------             ----------      --------------
+clk_100mhz                            {0.000 5.000}            10.000          100.000         
+  clk_125mhz_mmcm_out                 {0.000 4.000}            8.000           125.000         
+clk_pl_0                              {0.000 1.666}            3.333           300.030         
+sfp_mgt_refclk_0                      {0.000 3.200}            6.400           156.250         
+  qpll0outclk_out[0]                  {0.000 0.039}            0.078           12890.630       
+    gtwiz_userclk_rx_srcclk_out[0]    {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_rx_srcclk_out[0]_1  {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_rx_srcclk_out[0]_2  {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_rx_srcclk_out[0]_3  {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_tx_srcclk_out[0]    {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_tx_srcclk_out[0]_1  {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_tx_srcclk_out[0]_2  {0.000 1.280}            2.560           390.625         
+    gtwiz_userclk_tx_srcclk_out[0]_3  {0.000 1.280}            2.560           390.625         
+    txoutclkpcs_out[0]                {0.000 1.241}            2.482           402.832         
+    txoutclkpcs_out[0]_1              {0.000 1.241}            2.482           402.832         
+    txoutclkpcs_out[0]_2              {0.000 1.241}            2.482           402.832         
+    txoutclkpcs_out[0]_3              {0.000 1.241}            2.482           402.832         
+  qpll0outrefclk_out[0]               {0.000 3.200}            6.400           156.250         
+  qpll1outclk_out[0]                  {0.000 0.097}            0.194           5156.250        
+  qpll1outrefclk_out[0]               {0.000 3.200}            6.400           156.250         
+
+
+------------------------------------------------------------------------------------------------
+| Intra Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+Clock                                     WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints     WPWS(ns)     TPWS(ns)  TPWS Failing Endpoints  TPWS Total Endpoints  
+-----                                     -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------     --------     --------  ----------------------  --------------------  
+clk_100mhz                                                                                                                                                                              2.000        0.000                       0                     2  
+  clk_125mhz_mmcm_out                       4.390        0.000                      0                 2282        0.012        0.000                      0                 2282        2.200        0.000                       0                  1324  
+clk_pl_0                                    0.121        0.000                      0               136366        0.010        0.000                      0               136366        0.166        0.000                       0                 42826  
+sfp_mgt_refclk_0                            2.290        0.000                      0                 3224        0.016        0.000                      0                 3224        2.925        0.000                       0                  1555  
+    gtwiz_userclk_rx_srcclk_out[0]          0.820        0.000                      0                  384        0.013        0.000                      0                  384        0.400        0.000                       0                   295  
+    gtwiz_userclk_rx_srcclk_out[0]_1        0.856        0.000                      0                  384        0.011        0.000                      0                  384        0.400        0.000                       0                   295  
+    gtwiz_userclk_rx_srcclk_out[0]_2        0.173        0.000                      0                 6371        0.010        0.000                      0                 6371        0.400        0.000                       0                  2697  
+    gtwiz_userclk_rx_srcclk_out[0]_3        0.167        0.000                      0                 6371        0.016        0.000                      0                 6371        0.400        0.000                       0                  2697  
+    gtwiz_userclk_tx_srcclk_out[0]          0.051        0.000                      0                 4170        0.015        0.000                      0                 4170        0.400        0.000                       0                  1884  
+    gtwiz_userclk_tx_srcclk_out[0]_1        0.117        0.000                      0                 4170        0.027        0.000                      0                 4170        0.400        0.000                       0                  1884  
+    gtwiz_userclk_tx_srcclk_out[0]_2        1.415        0.000                      0                  264        0.021        0.000                      0                  264        0.400        0.000                       0                   205  
+    gtwiz_userclk_tx_srcclk_out[0]_3        1.314        0.000                      0                  264        0.020        0.000                      0                  264        0.400        0.000                       0                   205  
+    txoutclkpcs_out[0]                      1.442        0.000                      0                   34        0.132        0.000                      0                   34        0.966        0.000                       0                    15  
+    txoutclkpcs_out[0]_1                    1.417        0.000                      0                   34        0.121        0.000                      0                   34        0.966        0.000                       0                    15  
+    txoutclkpcs_out[0]_2                    1.460        0.000                      0                   34        0.128        0.000                      0                   34        0.966        0.000                       0                    15  
+    txoutclkpcs_out[0]_3                    1.157        0.000                      0                   34        0.097        0.000                      0                   34        0.966        0.000                       0                    15  
+
+
+------------------------------------------------------------------------------------------------
+| Inter Clock Table
+| -----------------
+------------------------------------------------------------------------------------------------
+
+From Clock                        To Clock                              WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------                        --------                              -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+clk_pl_0                          clk_125mhz_mmcm_out                     2.631        0.000                      0                   39                                                                        
+sfp_mgt_refclk_0                  clk_125mhz_mmcm_out                     5.365        0.000                      0                    5                                                                        
+gtwiz_userclk_rx_srcclk_out[0]    clk_125mhz_mmcm_out                     2.169        0.000                      0                    8                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_1  clk_125mhz_mmcm_out                     2.156        0.000                      0                    8                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_2  clk_125mhz_mmcm_out                     1.984        0.000                      0                    9                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_3  clk_125mhz_mmcm_out                     1.438        0.000                      0                    9                                                                        
+gtwiz_userclk_tx_srcclk_out[0]    clk_125mhz_mmcm_out                     2.157        0.000                      0                    3                                                                        
+gtwiz_userclk_tx_srcclk_out[0]_1  clk_125mhz_mmcm_out                     2.064        0.000                      0                    3                                                                        
+gtwiz_userclk_tx_srcclk_out[0]_2  clk_125mhz_mmcm_out                     2.208        0.000                      0                    2                                                                        
+gtwiz_userclk_tx_srcclk_out[0]_3  clk_125mhz_mmcm_out                     2.281        0.000                      0                    2                                                                        
+clk_125mhz_mmcm_out               clk_pl_0                                2.052        0.000                      0                   24                                                                        
+sfp_mgt_refclk_0                  clk_pl_0                                2.711        0.000                      0                   47                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_2  clk_pl_0                                1.880        0.000                      0                    8                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_3  clk_pl_0                                2.064        0.000                      0                    8                                                                        
+gtwiz_userclk_tx_srcclk_out[0]    clk_pl_0                                1.214        0.000                      0                   16                                                                        
+gtwiz_userclk_tx_srcclk_out[0]_1  clk_pl_0                                1.817        0.000                      0                   16                                                                        
+clk_pl_0                          sfp_mgt_refclk_0                        2.033        0.000                      0                  220                                                                        
+clk_125mhz_mmcm_out               gtwiz_userclk_rx_srcclk_out[0]          7.593        0.000                      0                    7                                                                        
+clk_125mhz_mmcm_out               gtwiz_userclk_rx_srcclk_out[0]_1        7.621        0.000                      0                    7                                                                        
+clk_125mhz_mmcm_out               gtwiz_userclk_rx_srcclk_out[0]_2        7.394        0.000                      0                   14                                                                        
+clk_pl_0                          gtwiz_userclk_rx_srcclk_out[0]_2        2.226        0.000                      0                    7                                                                        
+sfp_mgt_refclk_0                  gtwiz_userclk_rx_srcclk_out[0]_2        1.930        0.000                      0                   40                                                                        
+gtwiz_userclk_tx_srcclk_out[0]_1  gtwiz_userclk_rx_srcclk_out[0]_2        1.312        0.000                      0                    1        0.243        0.000                      0                    1  
+clk_125mhz_mmcm_out               gtwiz_userclk_rx_srcclk_out[0]_3        7.012        0.000                      0                   14                                                                        
+clk_pl_0                          gtwiz_userclk_rx_srcclk_out[0]_3        2.517        0.000                      0                    7                                                                        
+sfp_mgt_refclk_0                  gtwiz_userclk_rx_srcclk_out[0]_3        1.445        0.000                      0                   40                                                                        
+gtwiz_userclk_tx_srcclk_out[0]    gtwiz_userclk_rx_srcclk_out[0]_3        1.595        0.000                      0                    1        0.123        0.000                      0                    1  
+clk_125mhz_mmcm_out               gtwiz_userclk_tx_srcclk_out[0]          7.517        0.000                      0                   14                                                                        
+clk_pl_0                          gtwiz_userclk_tx_srcclk_out[0]          2.281        0.000                      0                   15                                                                        
+sfp_mgt_refclk_0                  gtwiz_userclk_tx_srcclk_out[0]          1.641        0.000                      0                   40                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_3  gtwiz_userclk_tx_srcclk_out[0]          1.283        0.000                      0                    1        0.261        0.000                      0                    1  
+clk_125mhz_mmcm_out               gtwiz_userclk_tx_srcclk_out[0]_1        7.585        0.000                      0                   14                                                                        
+clk_pl_0                          gtwiz_userclk_tx_srcclk_out[0]_1        2.281        0.000                      0                   15                                                                        
+sfp_mgt_refclk_0                  gtwiz_userclk_tx_srcclk_out[0]_1        1.945        0.000                      0                   40                                                                        
+gtwiz_userclk_rx_srcclk_out[0]_2  gtwiz_userclk_tx_srcclk_out[0]_1        1.336        0.000                      0                    1        0.235        0.000                      0                    1  
+clk_125mhz_mmcm_out               gtwiz_userclk_tx_srcclk_out[0]_2        7.540        0.000                      0                    7                                                                        
+clk_125mhz_mmcm_out               gtwiz_userclk_tx_srcclk_out[0]_3        7.554        0.000                      0                    7                                                                        
+
+
+------------------------------------------------------------------------------------------------
+| Other Path Groups Table
+| -----------------------
+------------------------------------------------------------------------------------------------
+
+Path Group                        From Clock                        To Clock                              WNS(ns)      TNS(ns)  TNS Failing Endpoints  TNS Total Endpoints      WHS(ns)      THS(ns)  THS Failing Endpoints  THS Total Endpoints  
+----------                        ----------                        --------                              -------      -------  ---------------------  -------------------      -------      -------  ---------------------  -------------------  
+**async_default**                 clk_pl_0                          clk_pl_0                                2.324        0.000                      0                    2        0.297        0.000                      0                    2  
+**async_default**                 gtwiz_userclk_rx_srcclk_out[0]    gtwiz_userclk_rx_srcclk_out[0]          1.755        0.000                      0                    1        0.255        0.000                      0                    1  
+**async_default**                 gtwiz_userclk_rx_srcclk_out[0]_1  gtwiz_userclk_rx_srcclk_out[0]_1        1.820        0.000                      0                    1        0.233        0.000                      0                    1  
+**async_default**                 gtwiz_userclk_rx_srcclk_out[0]_2  gtwiz_userclk_rx_srcclk_out[0]_2        0.319        0.000                      0                   15        0.257        0.000                      0                   15  
+**async_default**                 gtwiz_userclk_rx_srcclk_out[0]_3  gtwiz_userclk_rx_srcclk_out[0]_3        0.379        0.000                      0                   15        0.236        0.000                      0                   15  
+**async_default**                 gtwiz_userclk_tx_srcclk_out[0]    gtwiz_userclk_tx_srcclk_out[0]          0.574        0.000                      0                    6        0.437        0.000                      0                    6  
+**async_default**                 gtwiz_userclk_tx_srcclk_out[0]_1  gtwiz_userclk_tx_srcclk_out[0]_1        0.657        0.000                      0                    6        0.449        0.000                      0                    6  
+
+

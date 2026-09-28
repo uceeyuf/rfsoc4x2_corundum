@@ -1,0 +1,27 @@
+mqnic: rx: drop dma_sync_single_range_for_cpu() after dma_unmap_page()
+
+mqnic_process_rx_cq() unmaps the receive page, clears rx_info->dma_addr,
+and then calls dma_sync_single_range_for_cpu() with that cleared handle.
+The unmap already hands the buffer back to the CPU, and a sync on a
+handle that is no longer mapped has no valid meaning. On a
+cache-coherent host (x86 PCIe) it is a no-op; on a non-coherent platform
+such as a Zynq UltraScale+ without dma-coherent it adds a cache
+maintenance operation on every received packet, on DMA address 0.
+
+Against Corundum commit 1ca0151 (modules/mqnic/mqnic_rx.c).
+Apply from the Corundum root:  patch -p1 < 0001-mqnic-rx-drop-sync-after-unmap.patch
+
+diff --git a/modules/mqnic/mqnic_rx.c b/modules/mqnic/mqnic_rx.c
+index dfd479c3..17031144 100644
+--- a/modules/mqnic/mqnic_rx.c
++++ b/modules/mqnic/mqnic_rx.c
+@@ -367,9 +367,6 @@ int mqnic_process_rx_cq(struct mqnic_cq *cq, int napi_budget)
+ 				dma_unmap_len(rx_info, len), DMA_FROM_DEVICE);
+ 		rx_info->dma_addr = 0;
+ 
+-		dma_sync_single_range_for_cpu(dev, rx_info->dma_addr, rx_info->page_offset,
+-				rx_info->len, DMA_FROM_DEVICE);
+-
+ 		__skb_fill_page_desc(skb, 0, page, rx_info->page_offset, len);
+ 		rx_info->page = NULL;
+ 

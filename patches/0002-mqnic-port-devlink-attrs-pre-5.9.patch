@@ -1,0 +1,34 @@
+mqnic: port: use the pre-5.9 devlink_port_attrs_set() on older kernels
+
+devlink_port_attrs_set() takes a struct devlink_port_attrs since Linux 5.9.
+Corundum 1ca0151 calls only that form, so the driver does not build against
+the 5.4.0-xilinx-v2020.2 kernel of the RFSoC 4x2 image. On kernels before 5.9,
+pass the flavour and port number as separate arguments instead.
+
+Against Corundum commit 1ca0151 (modules/mqnic/mqnic_port.c).
+Apply from the Corundum root:  patch -p1 < 0002-mqnic-port-devlink-attrs-pre-5.9.patch
+
+--- a/modules/mqnic/mqnic_port.c
++++ b/modules/mqnic/mqnic_port.c
+@@ -5,6 +5,8 @@
+ 
+ #include "mqnic.h"
+ 
++#include <linux/version.h>
++
+ struct mqnic_port *mqnic_create_port(struct mqnic_if *interface, int index,
+ 		int phys_index, struct mqnic_reg_block *port_rb)
+ {
+@@ -23,7 +25,12 @@
+ 
+ 	attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
+ 	attrs.phys.port_number = phys_index;
++#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 9, 0)
+ 	devlink_port_attrs_set(&port->dl_port, &attrs);
++#else
++	devlink_port_attrs_set(&port->dl_port, attrs.flavour, attrs.phys.port_number,
++			false, 0, NULL, 0);
++#endif
+ 
+ 	ret = devlink_port_register(devlink, &port->dl_port, phys_index);
+ 	if (ret) {

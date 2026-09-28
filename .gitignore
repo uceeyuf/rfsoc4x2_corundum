@@ -1,0 +1,15 @@
+# Vivado project / outputs (recreate with scripts/build.tcl)
+build/
+.Xil/
+*.jou
+*.log
+*.str
+webtalk*
+vivado_pid*.zip
+
+# host tools (built on first use)
+host/libloopback_io.so
+__pycache__/
+loopback_out/
+kernel/work/
+kernel/out/

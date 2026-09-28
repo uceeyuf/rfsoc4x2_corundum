@@ -1,0 +1,177 @@
+UDP loopback through the board, 2026-09-28
+host/udp_loopback_viewer.py sends RGB24 test video from the host (ConnectX-4, enp2s0np0,
+192.168.100.2) to the board (eth0, 192.168.100.1), the board sends every packet back, and the
+host reassembles each frame and compares it byte by byte with what it sent.
+"intact" = every packet of the frame came back and the frame is identical; "incomplete" = at
+least one packet missing. Rates are payload per direction. Driver: patches/0001 + 0002 (B).
+Each block lists the settings in force; the tools improved between blocks.
+
+== Socket echo (tools/udp_echo), kernel 5.4.0-xilinx-v2020.2, MTU 1500, 4 flows, payload 1456,
+packet I/O in Python (before host/loopback_io.c)
+-- 720p30, 5 s
+   Board 192.168.100.1:1234-1237 (4 flows)   1280x720 @ 30 fps, 5 s   (1899 packets/frame, 2764800 B/frame)
+   Frames   sent 150   received intact 150   corrupted 0   incomplete 0
+   Packets  sent 284850   received 284850   lost 0.0000 %
+   Rate     TX 671.4 Mbps   RX 671.4 Mbps   frame latency avg 27.10 ms / max 30.70 ms
+-- 720p30, 30 s, GUI
+   Board 192.168.100.1:1234-1237 (4 flows)   1280x720 @ 30 fps, 30 s   (1899 packets/frame, 2764800 B/frame)
+   Frames   sent 900   received intact 900   corrupted 0   incomplete 0
+   Packets  sent 1709100   received 1709100   lost 0.0000 %
+   Rate     TX 571.2 Mbps   RX 571.2 Mbps   frame latency avg 37.64 ms / max 80.72 ms
+
+== Socket echo, MTU 9000, 16 flows, packet I/O in C, echo threads pinned round-robin, payload 8176
+-- 4K30, 5 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 5 s   (3044 packets/frame, 24883200 B/frame)
+   Frames   sent 150   received intact 22   corrupted 0   incomplete 128
+   Packets  sent 456600   received 408909   lost 10.4448 %
+   Rate     TX 5745.6 Mbps   RX 5145.5 Mbps   frame latency avg 337.66 ms / max 658.54 ms
+-- 4K30, 15 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 15 s   (3044 packets/frame, 24883200 B/frame)
+   Frames   sent 450   received intact 53   corrupted 0   incomplete 397
+   Packets  sent 1369800   received 1279672   lost 6.5796 %
+   Rate     TX 5895.6 Mbps   RX 5507.8 Mbps   frame latency avg 355.94 ms / max 584.22 ms
+
+== Socket echo, payload 8956, echo threads follow SO_INCOMING_CPU
+-- 4K30, 15 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 15 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 450   received intact 79   corrupted 0   incomplete 371
+   Packets  sent 1250550   received 1197946   lost 4.2065 %
+   Rate     TX 5904.7 Mbps   RX 5656.3 Mbps   frame latency avg 399.00 ms / max 655.79 ms
+-- 4K24, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 24 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 240   received intact 240   corrupted 0   incomplete 0
+   Packets  sent 666960   received 666960   lost 0.0000 %
+   Rate     TX 4789.1 Mbps   RX 4789.1 Mbps   frame latency avg 36.64 ms / max 83.25 ms
+-- 4K25, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 25 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 250   received intact 250   corrupted 0   incomplete 0
+   Packets  sent 694750   received 694750   lost 0.0000 %
+   Rate     TX 4987.1 Mbps   RX 4987.1 Mbps   frame latency avg 44.68 ms / max 205.20 ms
+-- 4K25, 20 s, GUI
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 25 fps, 20 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 500   received intact 500   corrupted 0   incomplete 0
+   Packets  sent 1389500   received 1389500   lost 0.0000 %
+   Rate     TX 4986.3 Mbps   RX 4986.3 Mbps   frame latency avg 41.41 ms / max 217.98 ms
+
+== Socket echo + UDP GRO/GSO in udp_echo
+-- 4K30, 15 s, packets round-robin over flows
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 15 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 450   received intact 149   corrupted 0   incomplete 301
+   Packets  sent 1250550   received 1247269   lost 0.2624 %
+   Rate     TX 5954.5 Mbps   RX 5938.8 Mbps   frame latency avg 447.45 ms / max 537.45 ms
+-- 4K30, 15 s, runs of 8 packets per flow
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 15 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 450   received intact 449   corrupted 0   incomplete 1
+   Packets  sent 1250550   received 1250548   lost 0.0002 %
+   Rate     TX 5982.6 Mbps   RX 5982.6 Mbps   frame latency avg 74.40 ms / max 267.31 ms
+-- 4K30, 10 s (repeat)
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 300   received intact 26   corrupted 0   incomplete 274
+   Packets  sent 833700   received 800650   lost 3.9643 %
+   Rate     TX 5858.7 Mbps   RX 5626.4 Mbps   frame latency avg 334.71 ms / max 617.36 ms
+-- 4K33, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 33 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 330   received intact 287   corrupted 0   incomplete 43
+   Packets  sent 917070   received 900608   lost 1.7951 %
+   Rate     TX 6500.6 Mbps   RX 6383.9 Mbps   frame latency avg 371.10 ms / max 484.72 ms
+-- 4K36, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 36 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 360   received intact 15   corrupted 0   incomplete 345
+   Packets  sent 1000440   received 835872   lost 16.4496 %
+   Rate     TX 7017.0 Mbps   RX 5862.8 Mbps   frame latency avg 227.91 ms / max 462.08 ms
+
+== Kernel reflector (tools/tc_reflect.sh), kernel 5.4.0-xilinx-v2020.2-bpf, MTU 9000, 16 flows,
+payload 8956, host rmem_max 4 MB (socket buffers capped)
+-- 1080p30, 3 s
+   Board 192.168.100.1:1234-1249 (16 flows)   1920x1080 @ 30 fps, 3 s   (695 packets/frame, 6220800 B/frame)
+   Frames   sent 90   received intact 90   corrupted 0   incomplete 0
+   Packets  sent 62550   received 62550   lost 0.0000 %
+   Rate     TX 1499.9 Mbps   RX 1499.9 Mbps   frame latency avg 24.94 ms / max 25.14 ms
+-- 4K30, 15 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 30 fps, 15 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 450   received intact 448   corrupted 0   incomplete 2
+   Packets  sent 1250550   received 1250519   lost 0.0025 %
+   Rate     TX 5985.2 Mbps   RX 5985.0 Mbps   frame latency avg 26.63 ms / max 26.87 ms
+-- 4K40, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 40 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 400   received intact 400   corrupted 0   incomplete 0
+   Packets  sent 1111600   received 1111600   lost 0.0000 %
+   Rate     TX 7980.7 Mbps   RX 7980.7 Mbps   frame latency avg 20.04 ms / max 22.38 ms
+-- 4K50, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 50 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 500   received intact 499   corrupted 0   incomplete 1
+   Packets  sent 1389500   received 1389491   lost 0.0006 %
+   Rate     TX 9974.8 Mbps   RX 9974.8 Mbps   frame latency avg 16.08 ms / max 18.64 ms
+-- 4K60, 10 s
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 60 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 600   received intact 600   corrupted 0   incomplete 0
+   Packets  sent 1667400   received 1667400   lost 0.0000 %
+   Rate     TX 11660.5 Mbps   RX 11660.5 Mbps   frame latency avg 13.50 ms / max 19.24 ms
+-- 4K80, 10 s, --cycle 20 --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 80 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 800   received intact 789   corrupted 0   incomplete 11
+   Packets  sent 2223200   received 2218599   lost 0.2070 %
+   Rate     TX 15955.3 Mbps   RX 15922.3 Mbps   frame latency avg 11.93 ms / max 82.14 ms
+-- 4K100, 10 s, --cycle 20 --spread 0.9 (lost packets = host RcvbufErrors)
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 100 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1000   received intact 983   corrupted 0   incomplete 17
+   Packets  sent 2779000   received 2766480   lost 0.4505 %
+   Rate     TX 19943.5 Mbps   RX 19853.6 Mbps   frame latency avg 10.47 ms / max 122.74 ms
+-- 4K120, 10 s, --cycle 20 --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 1181   corrupted 0   incomplete 19
+   Packets  sent 3334800   received 3319909   lost 0.4465 %
+   Rate     TX 22193.0 Mbps   RX 22093.9 Mbps   frame latency avg 16.46 ms / max 80.24 ms
+
+== Kernel reflector, host net.core.rmem_max = 256 MB, 16 reassembly buffers
+-- 4K100, 10 s, --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 100 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1000   received intact 990   corrupted 0   incomplete 10
+   Packets  sent 2779000   received 2779000   lost 0.0000 %
+   Rate     TX 19941.3 Mbps   RX 19941.3 Mbps   frame latency avg 14.24 ms / max 151.22 ms
+-- 4K110, 10 s, --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 110 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1100   received intact 1100   corrupted 0   incomplete 0
+   Packets  sent 3056900   received 3056900   lost 0.0000 %
+   Rate     TX 21931.6 Mbps   RX 21931.6 Mbps   frame latency avg 17.80 ms / max 157.62 ms
+-- 4K120, 10 s, --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 1174   corrupted 0   incomplete 26
+   Packets  sent 3334800   received 3334800   lost 0.0000 %
+   Rate     TX 22089.7 Mbps   RX 22089.7 Mbps   frame latency avg 20.36 ms / max 143.08 ms
+
+== Kernel reflector, reassembly buffers for 0.5 s of video, not pre-faulted
+-- 4K120, --spread 0.9
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 450   corrupted 0   incomplete 750
+   Packets  sent 3334800   received 3213141   lost 3.6482 %
+   Rate     TX 22328.0 Mbps   RX 21513.5 Mbps   frame latency avg 267.92 ms / max 587.44 ms
+-- 4K120, --spread 1.0
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 1130   corrupted 0   incomplete 70
+   Packets  sent 3334800   received 3334800   lost 0.0000 %
+   Rate     TX 21550.9 Mbps   RX 21550.9 Mbps   frame latency avg 86.21 ms / max 598.16 ms
+
+== Kernel reflector, reassembly buffers pre-faulted (final host tool)
+-- 4K120, --spread 0.9 (loss before the host NIC: bursts above line rate)
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 576   corrupted 0   incomplete 624
+   Packets  sent 3334800   received 3233680   lost 3.0323 %
+   Rate     TX 23019.7 Mbps   RX 22321.7 Mbps   frame latency avg 15.66 ms / max 21.32 ms
+-- 4K120, --spread 1.0
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 1200   corrupted 0   incomplete 0
+   Packets  sent 3334800   received 3334800   lost 0.0000 %
+   Rate     TX 22152.6 Mbps   RX 22152.6 Mbps   frame latency avg 15.91 ms / max 17.70 ms
+-- 4K120, --spread 0.9 (repeat; board rx/tx 3334817/3334817, tc dropped 0)
+   Board 192.168.100.1:1234-1249 (16 flows)   3840x2160 @ 120 fps, 10 s   (2779 packets/frame, 24883200 B/frame)
+   Frames   sent 1200   received intact 1200   corrupted 0   incomplete 0
+   Packets  sent 3334800   received 3334800   lost 0.0000 %
+   Rate     TX 22144.7 Mbps   RX 22144.7 Mbps   frame latency avg 15.68 ms / max 22.44 ms
+
+== Loss attribution, kernel reflector, 4K100, host rmem_max 4 MB (one 10 s run)
+host sent 2779000; board eth0 rx_packets +2779017, tx_packets +2779017 (17 background frames),
+tc dropped 0; host NIC rx_packets_phy +2779017, rx_discards_phy 0, rx_out_of_buffer 0;
+host UDP RcvbufErrors +15201 = packets missing at the viewer (2779000 - 2763799).
+With socket echo the board's 4 A53 cores were 90-100 % busy (udp_echo 272 % CPU, 59 % system,
+35 % softirq) at 4K30.
