@@ -32,6 +32,7 @@ wire, kernel pktgen). Timing met ([test report](docs/TEST_REPORT.md),
 - [Run](#en4)
 - [Loopback benchmark](#en7)
 - [Layout](#en5)
+- [Citation](#en8)
 - [License and acknowledgements](#en6)
 
 　
@@ -179,6 +180,35 @@ docs/         porting notes, test procedure, test report, results
 third_party/  Corundum (submodule, pinned)
 ```
 
+# <span id="en8">Citation</span>
+
+If this work helps your research, please cite it:
+
+```bibtex
+@misc{yu2026rfsoc4x2_corundum,
+    author = {Yijie Yu},
+    title = {{Corundum 25G NIC on the RFSoC 4x2}},
+    year = {2026},
+    howpublished = {\url{https://github.com/uceeyuf/rfsoc4x2_corundum}},
+    note = {GitHub repository},
+}
+```
+
+Please also cite Corundum:
+
+```bibtex
+@inproceedings{forencich2020fccm,
+    author = {Alex Forencich and Alex C. Snoeren and George Porter and George Papen},
+    title = {Corundum: An Open-Source {100-Gbps} {NIC}},
+    booktitle = {28th IEEE International Symposium on Field-Programmable Custom Computing Machines},
+    year = {2020},
+}
+```
+
+GitHub also offers the citation under **Cite this repository** (from [CITATION.cff](CITATION.cff)).
+
+　
+
 # <span id="en6">License and acknowledgements</span>
 
 BSD-2-Clause-Views, the same license as Corundum. The copyright of Corundum and of the ZCU102
@@ -218,6 +248,7 @@ MissingLinkElectronics. Pin data comes from the RealDigital RFSoC 4x2 board file
 - [运行](#cn4)
 - [回环测试](#cn7)
 - [目录结构](#cn5)
+- [引用](#cn8)
 - [许可与致谢](#cn6)
 
 　
@@ -351,6 +382,35 @@ kernel/       BPF/tc 内核配置片段与构建脚本
 docs/         移植笔记、测试步骤、测试报告、原始结果
 third_party/  Corundum(submodule,固定版本)
 ```
+
+# <span id="cn8">引用</span>
+
+如果这个项目对你的研究有帮助，请引用：
+
+```bibtex
+@misc{yu2026rfsoc4x2_corundum,
+    author = {Yijie Yu},
+    title = {{Corundum 25G NIC on the RFSoC 4x2}},
+    year = {2026},
+    howpublished = {\url{https://github.com/uceeyuf/rfsoc4x2_corundum}},
+    note = {GitHub repository},
+}
+```
+
+请同时引用 Corundum：
+
+```bibtex
+@inproceedings{forencich2020fccm,
+    author = {Alex Forencich and Alex C. Snoeren and George Porter and George Papen},
+    title = {Corundum: An Open-Source {100-Gbps} {NIC}},
+    booktitle = {28th IEEE International Symposium on Field-Programmable Custom Computing Machines},
+    year = {2020},
+}
+```
+
+GitHub 仓库页的 **Cite this repository** 也提供同样的引用（来自 [CITATION.cff](CITATION.cff)）。
+
+　
 
 # <span id="cn6">许可与致谢</span>
 

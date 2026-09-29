@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: software
+title: "Corundum 25G NIC on the RFSoC 4x2"
+authors:
+  - family-names: "Yu"
+    given-names: "Yijie"
+repository-code: "https://github.com/uceeyuf/rfsoc4x2_corundum"
+url: "https://github.com/uceeyuf/rfsoc4x2_corundum"
+date-released: 2026-09-28
+license: BSD-2-Clause-Views
+keywords:
+  - "RFSoC"
+  - "Corundum"
+  - "NIC"
+  - "25GbE"
+  - "FPGA"
+references:
+  - type: conference-paper
+    title: "Corundum: An Open-Source 100-Gbps NIC"
+    authors:
+      - family-names: "Forencich"
+        given-names: "Alex"
+      - family-names: "Snoeren"
+        given-names: "Alex C."
+      - family-names: "Porter"
+        given-names: "George"
+      - family-names: "Papen"
+        given-names: "George"
+    conference:
+      name: "28th IEEE International Symposium on Field-Programmable Custom Computing Machines"
+    year: 2020
